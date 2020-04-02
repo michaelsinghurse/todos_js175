@@ -7,6 +7,9 @@ const app = express();
 const HOST = "localhost";
 const PORT = 3000;
 
+// static data for initial testing
+let todoLists = require("./lib/seed-data");
+
 app.set("views", "./views");
 app.set("view engine", "pug");
 
