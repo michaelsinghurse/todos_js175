@@ -47,7 +47,7 @@ const loadTodo = (todoListId, todoId) => {
   let todoList = loadTodoList(todoListId);
   if (!todoList) return;
 
-  return todoList.todos.filter(todo => todo.id === todoId)[0];
+  return todoList.todos.find(todo => todo.id === todoId);
 };
 
 app.get("/", (req, res) => {
@@ -110,6 +110,26 @@ app.post("/lists/:todoListId/todos/:todoId/toggle", (req, res, next) => {
     req.flash("success", `"${todo.title}" marked complete.`);
   }
   
+  res.redirect(`/lists/${todoListId}`);
+});
+
+app.post("/lists/:todoListId/todos/:todoId/destroy", (req, res, next) => {
+  let { todoListId, todoId }  = req.params;
+  
+  let todoList = loadTodoList(+todoListId);
+  if (!todoList) {
+    next(new Error("Not found"));
+  }
+
+  let todo = loadTodo(+todoListId, +todoId);
+  if (!todo) {
+    next(new Error("Not found"));
+  }
+  
+  let title = todo.title;
+  todoList.removeAt(todoList.findIndexOf(todo));
+  
+  req.flash("success", `"${title}" deleted.`);  
   res.redirect(`/lists/${todoListId}`);
 });
 
