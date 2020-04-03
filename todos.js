@@ -17,15 +17,25 @@ app.set("views", "./views");
 app.set("view engine", "pug");
 
 app.use(morgan("common"));
+
 app.use(express.static("public"));
+
 app.use(express.urlencoded({ extended: false }));
+
 app.use(session({
   name: "launch-school-todos-session-id",
   resave: false,
   saveUninitialized: true,
   secret: "this is not very secure",
 }));
+
 app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.flash = req.session.flash;
+  delete req.session.flash;
+  next();
+});
 
 const compareByTitle = (todoListA, todoListB) => {
   let titleA = todoListA.title.toLowerCase();
