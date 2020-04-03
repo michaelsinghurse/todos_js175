@@ -64,6 +64,19 @@ app.get("/lists/new", (req, res) => {
   res.render("new-list"); 
 });
 
+app.get("/lists/:todoListId", (req, res, next) => {
+  let todoListId = req.params.todoListId;
+  let todoList = loadTodoList(+todoListId);
+  if (!todoList) {
+    next(new Error("Not found."));
+  } else {
+    res.render("list", {
+      todoList,
+      todos: sortTodos(todoList),
+    });
+  }
+});
+
 app.post("/lists",
   [
     body("todoListTitle")
@@ -131,19 +144,6 @@ app.post("/lists/:todoListId/todos/:todoId/destroy", (req, res, next) => {
   
   req.flash("success", `"${title}" deleted.`);  
   res.redirect(`/lists/${todoListId}`);
-});
-
-app.get("/lists/:todoListId", (req, res, next) => {
-  let todoListId = req.params.todoListId;
-  let todoList = loadTodoList(+todoListId);
-  if (!todoList) {
-    next(new Error("Not found."));
-  } else {
-    res.render("list", {
-      todoList,
-      todos: sortTodos(todoList),
-    });
-  }
 });
 
 app.use((err, req, res, _next) => {
