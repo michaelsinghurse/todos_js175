@@ -2,6 +2,8 @@
 
 const express = require("express");
 const morgan = require("morgan");
+const flash = require("express-flash");
+const session = require("express-session");
 const TodoList = require("./lib/todolist");
 
 const app = express();
@@ -17,6 +19,13 @@ app.set("view engine", "pug");
 app.use(morgan("common"));
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
+app.use(session({
+  name: "launch-school-todos-session-id",
+  resave: false,
+  saveUninitialized: true,
+  secret: "this is not very secure",
+}));
+app.use(flash());
 
 const compareByTitle = (todoListA, todoListB) => {
   let titleA = todoListA.title.toLowerCase();
@@ -56,21 +65,25 @@ app.get("/lists/new", (req, res) => {
 app.post("/lists", (req, res) => {
   let title = req.body.todoListTitle.trim();
   if (title.length === 0) {
+    req.flash("error", "A title was not provided.");
     res.render("new-list", {
-      errorMessage: "A title was not provided.",
+      flash: req.flash(),
     });
   } else if (title.length > 100) {
+    req.flash("error", "The title cannot exceed 100 characters.");
     res.render("new-list", {
-      errorMessage: "The title cannot exceed 100 characters",
+      flash: req.flash(),
       todoListTitle: title,
     });
   } else if (todoLists.some(list => list.title === title)) {
+    req.flash("error", "Sorry. That title is already taken.");
     res.render("new-list", {
-      errorMessage: "Sorry. That title is already taken.",
+      flash: req.flash(),
       todoListTitle: title,
     });
   } else {
     todoLists.push(new TodoList(title));
+    req.flash("success", "The todo list has been created.");
     res.redirect("/lists");
   }
 });
