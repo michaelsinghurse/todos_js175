@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "express-flash": "0.0.2",
     "express-session": "^1.17.0",
+    "express-validator": "^6.4.0",
     "morgan": "^1.10.0",
     "pug": "^2.0.4"
   },
