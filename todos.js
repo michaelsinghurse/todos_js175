@@ -146,6 +146,20 @@ app.post("/lists/:todoListId/todos/:todoId/destroy", (req, res, next) => {
   res.redirect(`/lists/${todoListId}`);
 });
 
+app.post("/lists/:todoListId/complete_all", (req, res, next) => {
+  let todoListId = req.params.todoListId;
+
+  let todoList = loadTodoList(+todoListId);
+  if (!todoList) {
+    next(new Error("Not found"));
+  }
+
+  todoList.markAllDone();
+
+  req.flash("success", "All items marked complete.");
+  res.redirect(`/lists/${todoListId}`);
+});
+
 app.use((err, req, res, _next) => {
   console.log(err);
   res.status(404).send(err.message);
