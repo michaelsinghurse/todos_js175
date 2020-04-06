@@ -78,6 +78,18 @@ app.get("/lists/:todoListId", (req, res, next) => {
   }
 });
 
+app.get("/lists/:todoListId/edit", (req, res, next) => {
+  let todoListId = req.params.todoListId;
+  let todoList = loadTodoList(+todoListId);
+  if (!todoList) {
+    next(new Error("Not found."));
+  }
+
+  res.render("edit-list", {
+    todoList,
+  });
+});
+
 app.post("/lists",
   [
     body("todoListTitle")
@@ -196,6 +208,19 @@ app.post("/lists/:todoListId/todos",
   }
 );
 
+app.post("/lists/:todoListId/destroy", (req, res, next) => {
+  let todoListId = +req.params.todoListId;
+  let index = todoLists.findIndex(todoList => todoList.id === todoListId); 
+  if (index === -1) {
+    next(new Error("Not found"));
+  }
+  
+  todoLists.splice(index, 1);
+
+  req.flash("success", "Todo list deleted.");
+  res.redirect("/lists");
+});
+
 app.use((err, req, res, _next) => {
   console.log(err);
   res.status(404).send(err.message);
@@ -204,28 +229,6 @@ app.use((err, req, res, _next) => {
 app.listen(PORT, () => {
   console.log(`Todos is listening on port ${PORT} of ${HOST}...`);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
